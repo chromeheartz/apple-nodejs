@@ -1,3 +1,6 @@
+/*
+
+*/
 // 서버를 open하기위한 기본셋팅
 // express를 첨부해주세요
 const express = require('express');
@@ -8,11 +11,18 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
 
-// listen이라는 함수를 쓰면 내 컴퓨터에 서버를 열 수 있다.
-// listen(서버띄울포트번호, 띄운 후 실행할 코드)
-app.listen(7777, function(){
-  console.log('listening on 7777')
-});
+const MongoClient = require('mongodb').MongoClient;
+MongoClient.connect('mongodb+srv://barnesquiat:<1q2w3e4r!@>@cluster0.uv1jq9q.mongodb.net/?retryWrites=true&w=majority', function(err, client){
+  // 실제로 접속을 확인해볼것임 접속이완료가되면 nodejs 서버띄우는 코드를 실행
+
+
+  // listen이라는 함수를 쓰면 내 컴퓨터에 서버를 열 수 있다.
+  // listen(서버띄울포트번호, 띄운 후 실행할 코드)
+  app.listen(7777, function(){
+    console.log('listening on 7777')
+  });
+})
+
 
 // 터미널에서 node server.js  (main으로걸어주었던것을 키면 listening on xxxx가 나옴)
 
@@ -152,3 +162,40 @@ app.post('/add', (req, res) => {
 
 
 */
+
+/*
+  웹사이트 기능만들기 기본
+
+  1. 서버로 데이터 전송할 수 있는 UI 만들고
+  2. 서버에서 원하는대로 정보를 처리해주면 된다.
+
+  중요정보니까 어딘가 저장하는게 좋은데 엑셀파일만들어서 거기다가 저장해도가능하고,
+  근데 엑셀은 십만단위가 넘어가도 버벅어긴다 그래서 Database에 저장한다
+
+  * DB 종류 
+
+  1. 관계형 
+  엑셀처럼 가로세로 칸이 나뉘어져있는것
+  데이터이름달고 실제데이터를 기입함. 이런데이터는 3차원을 다루지못한다.
+  대부분 SQL 이라는 언어를 써야한다. 대량의데이터를 입력하고 쿼리를줄때(내가 원하는것만뽑을때)
+  유용하다.
+
+  - MySQL, MariaDB, Oracle, MS SQL Server 등
+
+  2. NoSQL
+
+  그냥 파일을 하나 생성해서 거기다가 자료를 집어넣는데, Object 자료형으로 입출력가능
+  아주쉽고 자유롭게 데이터를 저장할수있는것이 장점이다.
+
+  - Dynamo, Oracle NoSQL, MongoDB, Redis, Cassandra 등
+
+
+  MongoDb 계정 세팅하고 라이브러리 설치 후
+  MongoClient를  쓴다고 설정을하고 콜백함수를 넣어줌
+  MongoClient.connect('URL', function(error, client){
+    콜백함수안에 nodeJs서버띄우는 코드를 실행해보면 listening on port 
+    이런식으로 잘 나온다
+  }
+
+*/
+
