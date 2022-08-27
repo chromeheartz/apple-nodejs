@@ -34,7 +34,7 @@ app.post('/add', (req, res) => {
     // console.log(result.totalPost);
     let totalPost = result.totalPost;
     database.collection('post').insertOne({ _id : totalPost + 1, date : req.body.date, title : req.body.title}, function(error, result) {
-      // console.log('save complete');
+      console.log('save complete');
       database.collection('counter').updateOne({name : "게시물갯수"}, { $inc : {totalPost : 1}}, function(error, result){
         if(error) return console.log(error)
       })
@@ -48,4 +48,10 @@ app.get('/list', (req, res) => {
     res.render('list.ejs', {posts : result});
   });
   
+})
+
+// delete 경로로 DELETE요청을 처리하는 코드
+app.delete('/delete', (req, res) => {
+  // 요청시 함꼐 보낸데이터를 찾는법.
+  console.log(req.body)
 })
