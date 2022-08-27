@@ -11,18 +11,38 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
 
-const MongoClient = require('mongodb').MongoClient;
-MongoClient.connect('mongodb+srv://barnesquiat:<1q2w3e4r!@>@cluster0.uv1jq9q.mongodb.net/?retryWrites=true&w=majority', function(err, client){
+// 어떤 데이터베이스에 넣을지
+var database
+MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?retryWrites=true&w=majority', { useUnifiedTopology: true },function(error, client){
   // 실제로 접속을 확인해볼것임 접속이완료가되면 nodejs 서버띄우는 코드를 실행
+  if(error) return console.log(error);
 
+  // todoapp이라는 database(폴더)에 연결해달라는뜻.
+  database = client.db('todoapp')
 
-  // listen이라는 함수를 쓰면 내 컴퓨터에 서버를 열 수 있다.
-  // listen(서버띄울포트번호, 띄운 후 실행할 코드)
+  /*
+    database는 폴더라고 생각하고 collection이라는것은 파일들이라고 보면된다.
+    post라는 collection(파일)에 insetOne을 하겠다.
+    database.collection('post').insertOne('저장할데이터', function(에러, 결과){
+      console.log('저장완료');
+    });
+
+    저장할데이터에 들어갈것은 모두 OBject자료형으로 들어가야한다.
+    원래는 스키마라고해서 데이터베이스를 만들때 이 데이터는 어떤 타입을 지정해야하는데
+    여기서는 알아서 넣어준다.
+
+    저장을하게되면 _id가 들어가는데 유니크한 키 이다. 자료저장시 _id 꼭 적어야함.
+    안적으면 강제로 부여가됨
+  */
+
+  database.collection('post').insertOne({name : "bibi", age : 30}, function(error, result){
+    console.log('save complete');
+  });
+
   app.listen(7777, function(){
     console.log('listening on 7777')
   });
 })
-
 
 // 터미널에서 node server.js  (main으로걸어주었던것을 키면 listening on xxxx가 나옴)
 
@@ -91,9 +111,15 @@ app.get('/', (req, res) => {
 */
 
 app.post('/add', (req, res) => {
-  res.send('전송완료')
   // 서버창에 데이터가 전달이된다.
-  console.log(req.body.title)
+  // console.log(req.body.title)
+
+  // 이부분은 항상 존재해야한다. 전송이 실패하든 성공하든 뭔가 서버에서 보내주어야함.
+  // 메세지 보내주기 싫다면 간단한 응답코드나 리다이렉트(페이지강제이동)를 해주는 코드도있다
+  res.send('add complete')
+  database.collection('post').insertOne({ data : req.body.date, title : req.body.title}, function(error, result) {
+    console.log('save complete');
+  })
 })
 
 /*
@@ -199,3 +225,18 @@ app.post('/add', (req, res) => {
 
 */
 
+// 리액트로 데이터바인딩 해보는법을 찾아보는것도 좋다.
+
+// list로 접속(get)요청하면 실제 DB에 저장된 데이터들로 데이터들을 보여줄것.
+
+app.get('/list', (req, res) => {
+  
+  /*
+    Failed to lookup view "list.ejs
+    이런에러가 뜬다.
+    서버에서 ejs파일같은것을 보내줄떄 위치가 중요하다.
+    ejs파일들 위치는 views폴더 내에 넣기
+  */
+ // list.ejs 파일을 렌더링해준다
+  res.render('list.ejs')
+})
