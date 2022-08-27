@@ -130,3 +130,9 @@ app.get('/list', (req, res) => {
   });
   
 })
+
+// delete 경로로 DELETE요청을 처리하는 코드
+app.delete('/delete', (req, res) => {
+  // 요청시 함꼐 보낸데이터를 찾는법.
+  console.log(req.body)
+})
