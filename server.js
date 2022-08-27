@@ -28,23 +28,19 @@ app.get('/write', function(req, res){
 
 app.post('/add', (req, res) => {
   res.send('add complete')
-  database.collection('post').insertOne({ date : req.body.date, title : req.body.title}, function(error, result) {
-    console.log('save complete');
-  })
+  
+  database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
+    // console.log(result.totalPost);
+    let totalPost = result.totalPost;
+    database.collection('post').insertOne({ _id : totalPost + 1, date : req.body.date, title : req.body.title}, function(error, result) {
+      console.log('save complete');
+    })
+  });
 })
 
 app.get('/list', (req, res) => {
-  // database의 데이터를 꺼냄. post라는 collection의 어떤것을 빼달라.
-  // find().toArray()를쓰면 모든것들을 가져올수있지만 메타데이터도 들어옴
   database.collection('post').find().toArray(function(error, result){
-    console.log(result);
-    /*
-      db에서 찾은자료를 ejs파일에 넣기
-
-      .render()라는 함수에 둘째 파라미터를 써주면
-      list.ejs 파일을 렌더링함과 동시에 {posts : result}라는 데이터를 함께 보내줄수있다.
-      * 정확히말하면 result 라는 데이터를 posts라는 이름으로 ejs 파일에 보내달라고한것
-    */
+    // console.log(result);
     res.render('list.ejs', {posts : result});
   });
   
