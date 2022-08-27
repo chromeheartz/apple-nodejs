@@ -3,6 +3,7 @@ const app = express();
 
 // bodyparser 선언
 const bodyParser = require('body-parser');
+const { countReset } = require('console');
 app.use(bodyParser.urlencoded({extended : true}));
 const MongoClient = require('mongodb').MongoClient;
 app.set('view engine', 'ejs');
@@ -28,12 +29,15 @@ app.get('/write', function(req, res){
 
 app.post('/add', (req, res) => {
   res.send('add complete')
-  
+
   database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
     // console.log(result.totalPost);
     let totalPost = result.totalPost;
     database.collection('post').insertOne({ _id : totalPost + 1, date : req.body.date, title : req.body.title}, function(error, result) {
-      console.log('save complete');
+      // console.log('save complete');
+      database.collection('counter').updateOne({name : "게시물갯수"}, { $inc : {totalPost : 1}}, function(error, result){
+        if(error) return console.log(error)
+      })
     })
   });
 })

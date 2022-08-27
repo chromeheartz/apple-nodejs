@@ -80,13 +80,28 @@ app.post('/add', (req, res) => {
     totalPost는 지금까지 발행된 총 게시물 갯수를 기록
     counter라는 collection에서 name이 게시물갯수인것을 찾아주세요 라는 뜻.
   */
-    database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
-      // console.log(result.totalPost);
-      let totalPost = result.totalPost;
-      database.collection('post').insertOne({ _id : totalPost + 1, date : req.body.date, title : req.body.title}, function(error, result) {
-        console.log('save complete');
+  database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
+    // console.log(result.totalPost);
+    let totalPost = result.totalPost;
+    database.collection('post').insertOne({ _id : totalPost + 1, date : req.body.date, title : req.body.title}, function(error, result) {
+      console.log('save complete');
+      /*
+        id 발행 후 총개시물갯수 증가 mongoDb에서 어떤값을 수정할때 쓰는것 updateOne
+        많이 수정할때는 updateMany 3번째 함수는 안써도됨
+        (어떤데이터를수정할지, 수정값을입력,)
+        업데이트류의 함수를 쓸떄는 operator를 써야한다.
+        중괄호를 하나 더열어서 담아주고 
+        $set 이 update operator이다.
+        $set(변경), $inc(증가), $min(기존값보다 적을때만 변경), $rename (key값 이름변경) 등이있음.
+
+        콜백함수에서 쓸때는 업데이트를 시켜주고, 완료가되면 안에있는 코드를 실행해주세요.맥락으로쓸것.
+        에러체킹 혹은 결과값 반환받기 등등.
+      */
+      database.collection('counter').updateOne({name : "게시물갯수"}, { $inc : {totalPost : 1}}, function(error, result){
+        if(error) return console.log(error)
       })
-    });
+    })
+  });
 })
 
 // 리액트로 데이터바인딩 해보는법을 찾아보는것도 좋다.
