@@ -1,12 +1,10 @@
 const express = require('express');
-// 첨부한 라이브러리를이용해서 객체를만듬
 const app = express();
 
 // bodyparser 선언
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
 const MongoClient = require('mongodb').MongoClient;
-// ejs관련코드
 app.set('view engine', 'ejs');
 
 var database
@@ -30,21 +28,24 @@ app.get('/write', function(req, res){
 
 app.post('/add', (req, res) => {
   res.send('add complete')
-  database.collection('post').insertOne({ data : req.body.date, title : req.body.title}, function(error, result) {
+  database.collection('post').insertOne({ date : req.body.date, title : req.body.title}, function(error, result) {
     console.log('save complete');
   })
 })
 
-// list로 접속(get)요청하면 실제 DB에 저장된 데이터들로 데이터들을 보여줄것.
-
 app.get('/list', (req, res) => {
+  // database의 데이터를 꺼냄. post라는 collection의 어떤것을 빼달라.
+  // find().toArray()를쓰면 모든것들을 가져올수있지만 메타데이터도 들어옴
+  database.collection('post').find().toArray(function(error, result){
+    console.log(result);
+    /*
+      db에서 찾은자료를 ejs파일에 넣기
+
+      .render()라는 함수에 둘째 파라미터를 써주면
+      list.ejs 파일을 렌더링함과 동시에 {posts : result}라는 데이터를 함께 보내줄수있다.
+      * 정확히말하면 result 라는 데이터를 posts라는 이름으로 ejs 파일에 보내달라고한것
+    */
+    res.render('list.ejs', {posts : result});
+  });
   
-  /*
-    Failed to lookup view "list.ejs
-    이런에러가 뜬다.
-    서버에서 ejs파일같은것을 보내줄떄 위치가 중요하다.
-    ejs파일들 위치는 views폴더 내에 넣기
-  */
- // list.ejs 파일을 렌더링해준다
-  res.render('list.ejs')
 })
