@@ -203,3 +203,13 @@
       textStatus = 응답코드
       errorThrown = 에러메세지
     */
+
+    /*
+      css파일은 static file이라고한다. 데이터에의해 변하지않는파일
+      보통 이런파일들은 public폴더안에 넣어놓는것이 관습이다.
+
+      한가지 과정이 더 필요한데, 
+      app.use('/public', express.static('public'));
+      미들웨어라고 요청과 응답사이에 동작하는 코드인데
+      static파일을 보관하기 위해 public폴더를 쓸것이다라고 얘기.
+    */

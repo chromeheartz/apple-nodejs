@@ -8,6 +8,9 @@ app.use(bodyParser.urlencoded({extended : true}));
 const MongoClient = require('mongodb').MongoClient;
 app.set('view engine', 'ejs');
 
+// 미들웨어 요청과 응답사이에 동작하는 자바스크립트 코드
+app.use('/public', express.static('public'));
+
 var database
 MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?retryWrites=true&w=majority', { useUnifiedTopology: true },function(error, client){
   if(error) return console.log(error);
@@ -20,11 +23,19 @@ MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?r
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
+  database.collection('post').find().toArray(function(error, result){
+    // console.log(result);
+    res.render('index.ejs', {posts : result});
+  });
+  
+})
 
-app.get('/write', function(req, res){
-  res.sendFile(__dirname + '/write.html');
+app.get('/index', (req, res) => {
+  database.collection('post').find().toArray(function(error, result){
+    // console.log(result);
+    res.render('index.ejs', {posts : result});
+  });
+  
 })
 
 app.post('/add', (req, res) => {
@@ -46,6 +57,14 @@ app.get('/list', (req, res) => {
   database.collection('post').find().toArray(function(error, result){
     // console.log(result);
     res.render('list.ejs', {posts : result});
+  });
+  
+})
+
+app.get('/write', (req, res) => {
+  database.collection('post').find().toArray(function(error, result){
+    // console.log(result);
+    res.render('write.ejs', {posts : result});
   });
   
 })
