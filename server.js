@@ -58,3 +58,11 @@ app.delete('/delete', (req, res) => {
     res.status(200).send({ message : 'complete' });
   })
 })
+
+// **** 이부분 이해하는것 중요.
+app.get('/detail/:id', (req, res) => {
+  database.collection('post').findOne({_id : parseInt(req.params.id)}, function (error, result){
+    console.log(result);
+    res.render('detail.ejs', { data : result})
+  })
+})

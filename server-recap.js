@@ -159,3 +159,24 @@ app.delete('/delete', (req, res) => {
     res.status(200).send({ message : 'complete' });
   })
 })
+
+
+/*
+  /detail/ 이후에 들어가는 게시물 번호에 따라 맞는 상세페이지 보내주기
+  Parameter로 요청 가능한 URL을 만들기
+
+  :를 붙이게 되면 사용자가 이 뒤에 아무문자열이나 입력을 하면 이것을해주세요라는뜻
+  URL의 parameter라는 것임
+*/
+// **** 이부분 이해하는것 중요.
+app.get('/detail/:id', (req, res) => {
+  // db에서 원하는데이터찾기
+  // req.params.id URL의 parameter중에 id를 넣어주세요 라는뜻
+  database.collection('post').findOne({_id : parseInt(req.params.id)}, function (error, result){
+    // 서버에 null이 뜰때 query문 날린것을 잘 확인해보아야함. 지금 database에 있는데 null이 나온다는것은
+    // 자료형이 달라서그렇다. Number()로 넣어주어도 되고 parseInt해줘도됨
+    console.log(result);
+    // 두번째인자 중요. result라는 데이터를 data라는 이름으로 보내주세요 (ejs파일로 데이터 보내는법)
+    res.render('detail.ejs', { data : result})
+  })
+})
