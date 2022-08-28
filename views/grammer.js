@@ -178,3 +178,28 @@
   장점은 새로고침없이 한다. 비동기로.
 
 */
+
+/*
+      고객요청에 응답하는 여러가지 방법
+
+      app.get('/어쩌구', function(요청, 응답){
+        응답.send('<p>some html</p>')
+        응답.status(404).send('Sorry, we cannot find that!')
+        응답.sendFile('/uploads/logo.png')
+        응답.render('list.ejs', { ejs에 보낼 데이터 })
+        응답.json(제이슨데이터)
+      });
+
+      send는 간단한 문자나 HTML을 보낼 수 있습니다. 
+      status는 응답코드를 보낼 수 있습니다. 
+      sendFile은 static 파일들을 보낼 수 있습니다. 
+      render는 ejs등의 템플릿이 적용된 페이지들을 렌더링해줄 수 있습니다. 
+      json은 제이슨 데이터를 담아보낼 수 있습니다. 
+
+      status(400)으로 실패가 되었을때
+      ajax fail쪽 함수의 세개의인자로 원인을알아볼수있음
+      fail(function(xhr, textStatus, errorThrown){...}
+
+      textStatus = 응답코드
+      errorThrown = 에러메세지
+    */

@@ -59,7 +59,9 @@
   <script>
 
     $('.delete').click(function(event){
-      let noticeNumber = event.target.dataset.id;
+      const noticeNumber = event.target.dataset.id;
+      // e.target 지금 클릭한것, this 지금 이벤트 동작하는곳
+      const thisEl = $(this);
       // jqeury를 이용해 ajax요청, 새로고침할때마다 실행이됨
       $.ajax({
         method : "DELETE",
@@ -68,11 +70,15 @@
         // 지금 내가 클릭한 버튼의 id를 집어넣기.
         // 버튼을 눌러도 안되는것은 AJAX는 새로고침없이 서버에게 요청하는 방법이기때문
         data : {_id : noticeNumber}
-      }).done(function(result){
+        // 서버에서 응답을해줘야 done을 실행시켜줌
+      }).done((result) =>{
         // 요청이 성공했을때 실행될 코드 요청.body에 담긴 게시물번호에따라 DB에서 게시물 삭제
-        
-      }).fail(function(error){
+        console.log('성공했어염')
+        thisEl.parents('li').fadeOut();
+        // fail되었을때 세개의인자로 원인을알아볼수있음
+      }).fail(function(xhr, textStatus, errorThrown){
         // 요청이 실패했을때 실행할 코드
+        console.log(xhr, textStatus, errorThrown)
       })
     })
 

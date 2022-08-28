@@ -135,4 +135,27 @@ app.get('/list', (req, res) => {
 app.delete('/delete', (req, res) => {
   // 요청시 함꼐 보낸데이터를 찾는법.
   console.log(req.body)
+  /*
+    deleteOne 은 삭제해주는 함수
+    첫번째 인자로는 query문을쓴다. 어떤항목을 삭제할지.
+    두번째 인자로는 요청이 끝난후에 실행할 콜백함수
+    database.collection('post').deleteOne(req.body, function(error,result){
+      console.log('delete complete')
+    })
+    ajax에서 요청한 데이트가 data : {_id : 1} 이면 {_id : 1}이
+    req.body에 들어가게되니 실제로는 {_id : 1}인것을 찾아서 지워달라는 말이되는것이다.
+    현재상태에서는 삭제가 안되지만 자료형이 조금달라서 삭제가안되는것이다.
+    실제 데이터베이스에서는 1이고 우리가 보낼것은 '1'이라서 number, string이 달라서그렇다
+
+    우리가 number를 보냈는데 왜 문자로 보내지는것일까. 간혹 치환이되는경우가있어서
+    값을 숫자로 변환시켜주어야한다.
+  */
+  // 숫자로변환한것을 다시 넣어줌
+  req.body._id = parseInt(req.body._id)
+  database.collection('post').deleteOne(req.body, function(error,result){
+    console.log('delete complete')
+    // 응답코드 200을 보내주세요 요청성공. 400은 고객잘못으로 요청실패라는뜻, 500은 서버문제요청실패
+    // .send는 서버에서 메시지를 보낼때 쓰는 함수. 글자만써도되고 object로 넣어도됨
+    res.status(200).send({ message : 'complete' });
+  })
 })
