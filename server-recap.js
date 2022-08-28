@@ -11,6 +11,9 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
 const MongoClient = require('mongodb').MongoClient;
+// form태그에서 put, delete를 하기위한 라이브러리
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'))
 // ejs관련코드
 app.set('view engine', 'ejs');
 
@@ -180,3 +183,26 @@ app.get('/detail/:id', (req, res) => {
     res.render('detail.ejs', { data : result})
   })
 })
+
+// edit페이지를 만들고 실제게시물이 없는 파라미터일경우에 404페이지 출력.
+app.get('/edit/:id', (req,res) => {
+  // id로 들어오는 게시물의 제목과 날짜를 edit.ejs로 보냄.
+  // findeOne안에 어떤 데이터를 찾고싶은지 query문을 넣음
+  database.collection('post').findOne({_id : parseInt(req.params.id)}, function(error, result){
+    console.log(result);
+    if(result) {
+      res.render('edit.ejs', { post : result })
+    } else {
+      res.render('error.ejs')
+    }
+  })
+})
+
+/*
+  PUT 요청을 하기위해 method-override 라이브러리 설치
+  설치후 선언하고 이런식으로 form을 쓰면
+
+  <form action="/edit?_method=PUT" method="post">
+  edit경로로 put요청을 할수있게된다.
+  
+*/
