@@ -206,3 +206,27 @@ app.get('/edit/:id', (req,res) => {
   edit경로로 put요청을 할수있게된다.
   
 */
+
+app.put('/edit', (req,res) => {
+  /*
+    updateOne은 어떤 게시물을 찾아서 하나만 업데이트시켜준다,
+    (어떤게시물수정할건지, 수정값, 콜백함수)
+    operator set은 업데이트해달라는뜻이다 없으면 추가해달라고 말하는것.
+
+    현재 수정할 날짜와 제목은 보내고있는데 무슨 id의 게시물을 바꿀지는 안보내고있다.
+    서버한테 함께 id를 보내주어야하는데 크게 두가지가 있을수있다.
+
+    - /edit?_... 부분에 url의 parameter를 넣어줄수도있을것이고
+    - 안보이는 input태그를 만들어서 
+    <input type="text" value="<%= post._id %>" name="id" style="display:none;">
+    이런식으로
+
+    몰래보낸 post._id 데이터를 서버에서 꺼내는법.
+    req.body.id input중에 name이 id인것을 보내주세요. 하는것.
+  */
+  database.collection('post').updateOne({ _id : parseInt(req.body.id) }, { $set : {title : req.body.title, date : req.body.date}}, (error, result) => {
+    console.log('edit complete')
+    // 변경후에 다른페이지로 이동을 한다던지 해야함.
+    res.redirect('/list')
+  })
+})

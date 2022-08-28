@@ -22,6 +22,8 @@
     <form action="/edit?_method=PUT" method="post">
       <div class="form-group">
         <label>오늘의 할일</label>
+        <!-- id값을 보내기위한 숨김인풋 -->
+        <input type="text" value="<%= post._id %>" name="id" style="display:none;">
         <input value="<%= post.title %>" type="text" class="form-control" name="title">
       </div>
       <div class="form-group">

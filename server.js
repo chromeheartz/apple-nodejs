@@ -88,3 +88,12 @@ app.get('/edit/:id', (req,res) => {
     }
   })
 })
+
+
+app.put('/edit', (req,res) => {
+  database.collection('post').updateOne({ _id : parseInt(req.body.id) }, { $set : {title : req.body.title, date : req.body.date}}, (error, result) => {
+    console.log('edit complete')
+    // 변경후에 list페이지로 이동시킴
+    res.redirect('/list')
+  })
+})
