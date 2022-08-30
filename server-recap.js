@@ -262,6 +262,31 @@ app.post('/login', passport.authenticate('local', {
   res.redirect('/')
 })
 
+// 마이페이지 만들기
+/*
+  로그인을 한 사람만 보여줄수있도록한다. 미들웨어를 사용함
+  mypage로 누가 요청을하면 미들웨어에 있는 코드를 실행한 다음에 응답을 해준다
+*/
+app.get('/mypage', isLogined, (req, res) => {
+  console.log(req.user)
+  // 찾은 유저정보를 mypage.ejs에 보냄
+  res.render('mypage.ejs', {user : req.user})
+});
+
+// 이 사람이 로그인한 데이터가 있어야 마이페이지로 보내져야하니 미들웨어같은 함수를 하나만든다.
+function isLogined(req, res, next) {
+  // 마이페이지 접속 전 실행할 미들웨어
+  // 로그인 후 세션이 있으면 요청.user가 항상있음. 출력해서 확인해보기
+  if(req.user) {
+    // 다음으로 통과
+    next()
+  } else {
+    // 경고메세지 응답
+    res.send("i can't find user");
+  }
+
+}
+
 // 아이디 비번 인증하는 세부코드
 // 인증하는 방법은 Strategy라고 함
 passport.use(new LocalStrategy({
@@ -314,9 +339,24 @@ passport.serializeUser((user, done) => {
   done(null, user.id)
 });
 
-// 나중에 호출되는것. (마이페이지 접속시 발동)
-// 이사람이 세션데이터에 있다면 해석을하는부분. 데이터를 가진사람을 DB에서 찾아주세요
-passport.deserializeUser((user, done) => {
-  done(null, {})
-});
+/*
+  나중에 호출되는것. (마이페이지 접속시 발동)
+  세션을 찾을때
+  user.id가 매개변수의 첫번째 자리로 들어오니 그것을 기반으로 findOne을 할 수있다
+*/
+passport.deserializeUser((id, done) => { 
+  /*
+    user.id로 유저를 찾은뒤에 유저 정보를
+    done(null, {})의 {}에 넣음
 
+    * 로그인한 유저의 세션아이디를 바탕으로 개인정보를 DB에서 찾는역할
+    리턴해주는것이 중괄호안에 들어가는것이다.
+    유저의 DB이름같은것을 마이페이지에서 출력해준다.
+
+    마이페이지 접속시 DB에서 {id : 어쩌구, ...}인걸 찾아서 그 결과를 보내줌 
+    그 결과는 마이페이지 접속할때 요청.user 로 들어오게 된다
+  */
+  database.collection('login').findOne({id : id}, function(error, result){
+    done(null, result) // result 는 id: bibiboy, pw : test 이렇게 들어오는것
+  })
+});

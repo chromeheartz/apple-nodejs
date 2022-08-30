@@ -118,6 +118,22 @@ app.post('/login', passport.authenticate('local', {
   res.redirect('/')
 })
 
+// 마이페이지 만들기
+app.get('/mypage', isLogined, (req, res) => {
+  // console.log(req.user)
+  res.render('mypage.ejs', {user : req.user})
+});
+function isLogined(req, res, next) {
+  if(req.user) {
+    // 다음으로 통과
+    next()
+  } else {
+    // 경고메세지 응답
+    res.send("i can't find user");
+  }
+
+}
+
 // 아이디 비번 인증하는 세부코드
 passport.use(new LocalStrategy({
   usernameField: 'id',
@@ -125,7 +141,7 @@ passport.use(new LocalStrategy({
   session: true,
   passReqToCallback: false,
 }, function (id, password, done) {
-  console.log(id, password);
+  // console.log(id, password);
   // DB에 입력한 아이디가 맞는지 확인
   database.collection('login').findOne({ id: id }, function (error, result) {
     if (error) return done(error)
@@ -144,7 +160,10 @@ passport.serializeUser((user, done) => {
   done(null, user.id)
 });
 
-passport.deserializeUser((user, done) => {
-  done(null, {})
+// 세션을 찾을때
+passport.deserializeUser((id, done) => { 
+  database.collection('login').findOne({id : id}, function(error, result){
+    done(null, result)
+  })
 });
 
