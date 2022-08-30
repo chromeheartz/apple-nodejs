@@ -7,7 +7,7 @@
   - token-based(JWT)
   - Open Autentication
 
-  1. Session-based Authentication
+  ***** 1. Session-based Authentication
 
   사용자의 세션정보를 저장해서 로그인 기능을 구현하는 방법입니다. 
   그냥 쉽게말하면
@@ -72,7 +72,7 @@
   세션은 매우 전통적이고 범용적으로 사용되는 인증방식입니다. 
   그러므로 여러분이 개발 중 위기에 처했을 때 참고할 구글 검색결과가 풍부합니다. 
 
-  2. JSON Web Token (JWT)
+  ***** 2. JSON Web Token (JWT)
 
   토큰 방식은 세션데이터를 서버에 저장하지 않고
   마이페이지를 열람할 수 있는 열쇠(토큰)를 사용자에게 쥐어주는 것입니다. 
@@ -111,7 +111,7 @@
   그러면 위에서 말했던 세션 방식이랑 기능 상 다를바가 없습니다. 
 
 
-  3. Open Autentication
+  ***** 3. Open Autentication
 
   이 방법은 쉽게말하면 페이스북, 구글 로그인입니다.
   고객의 페이스북, 구글 계정정보를 불러와서 그걸 가지고 가입을 승인시켜주는 방법입니다.  
