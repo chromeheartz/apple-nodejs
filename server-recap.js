@@ -230,3 +230,93 @@ app.put('/edit', (req,res) => {
     res.redirect('/list')
   })
 })
+
+
+// session 방식 로그인 기능 구현을 위한 라이브러리 3개
+// passport passport-local express-session
+
+// 라이브러리들 첨부
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
+
+// 미들웨어 설정
+// 미들웨어 : 요청 - 응답 중간에 뭔가 실행되는 코드
+// secret 의 value는 세션을 만들떄의 비밀번호가됨.
+app.use(session({secret: '비밀코드', resave : true, saveUninitialized : false}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('/login', (req, res) => {
+  res.render('login.ejs')
+})
+
+// passport 로그인기능 쉽게 구현가능해지는 라이브러리
+// authenticate는 인증해달라는것. local이라는 방식으로 회원인지 인증해달라는뜻
+// 성공을하고 중괄호를 넣어놓으면 세팅을 할 수 있음. failureRedirect 실패했을시에 이 경로로 이동시켜주라는뜻
+app.post('/login', passport.authenticate('local', {
+  failureRedirect : '/fail'
+}), (req, res) => {
+  // 로그인 요청시 실행될코드들
+  // 회원인증 성공하면 redirect /여기로 보내달라는뜻
+  res.redirect('/')
+})
+
+// 아이디 비번 인증하는 세부코드
+// 인증하는 방법은 Strategy라고 함
+passport.use(new LocalStrategy({
+  usernameField: 'id',
+  passwordField: 'pw',
+  // 로그인 후 세션을 저장할것인지
+  session: true,
+  // 사용자의 다른정보 검증시 true로 바꾸면 매개변수를 하나 더 넣을수있다. req로 넣어서 req.body하면 볼수있음
+  passReqToCallback: false,
+  // 이부분이 사용자의 아이디랑 비번을 DB와 비교해서 검증하는 부분이다
+}, function (id, password, done) {
+  console.log(id, password);
+  // DB에 입력한 아이디가 맞는지 확인
+  database.collection('login').findOne({ id: id }, function (error, result) {
+    if (error) return done(error)
+    /*
+      만약 결과(일치하는것이없다)가 없으면 !result부분을 실행하고
+      DB에 아이디가 있으면 입력한비번과 결과.pw를 비교
+
+      return done()여기서 done()이 무엇이냐면
+      라이브러리 문법이다. 3개의 파라미터를 가질수있다.
+      (서버에러, 성공시사용자DB데이터, 에러메세지 넣는곳)
+    */
+    if (!result) return done(null, false, { message: '존재하지않는 아이디요' })
+    // pw가 암호화되지않아서 보안이 좋지않다.
+    if (password == result.pw) {
+      // 모든게 다 맞아서 사용자DB데이터를 담는것
+      return done(null, result)
+    } else {
+      return done(null, false, { message: '비번틀렸어요' })
+    }
+  })
+}));
+
+/*
+  검사가 끝났을때 이사람이 로그인했다는 정보를 세션을 하나 만들어서 저장을해주어야한다.
+  세션방식이 로그인성공 -> 세션정보를 만듬(로그인했었는지)
+  세션이 있어야 마이페이지 방문시 세션검사가가능
+
+  세션에 등록하는법 (로그인을 유지하는것)
+*/
+// 세션 만들기
+
+/*
+  세션을 저장시키는 코드(로그인 성공시 발동) user.id라는 정보로 세션을 만듬
+  아이디 비번이 맞을시에 들어가는 result가 user로 들어오게되는것
+  세션 데이터를 만들고 세션의 id정보를 쿠키로보냄
+*/
+passport.serializeUser((user, done) => {
+  done(null, user.id)
+});
+
+// 나중에 호출되는것. (마이페이지 접속시 발동)
+// 이사람이 세션데이터에 있다면 해석을하는부분. 데이터를 가진사람을 DB에서 찾아주세요
+passport.deserializeUser((user, done) => {
+  done(null, {})
+});
+

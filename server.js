@@ -98,17 +98,12 @@ app.put('/edit', (req,res) => {
   })
 })
 
-// session 방식 로그인 기능 구현을 위한 라이브러리 3개
-// passport passport-local express-session
-
 // 라이브러리들 첨부
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 
 // 미들웨어 설정
-// 미들웨어 : 요청 - 응답 중간에 뭔가 실행되는 코드
-// secret 의 value는 세션을 만들떄의 비밀번호가됨.
 app.use(session({secret: '비밀코드', resave : true, saveUninitialized : false}));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -117,36 +112,39 @@ app.get('/login', (req, res) => {
   res.render('login.ejs')
 })
 
-// passport 로그인기능 쉽게 구현가능해지는 라이브러리
-// authenticate는 인증해달라는것. local이라는 방식으로 회원인지 인증해달라는뜻
-// 성공을하고 중괄호를 넣어놓으면 세팅을 할 수 있음. failureRedirect 실패했을시에 이 경로로 이동시켜주라는뜻
-app.post('login', passport.authenticate('local', {
+app.post('/login', passport.authenticate('local', {
   failureRedirect : '/fail'
 }), (req, res) => {
-  // 로그인 요청시 실행될코드들
-  // 회원인증 성공하면 redirect /여기로 보내달라는뜻
   res.redirect('/')
 })
 
 // 아이디 비번 인증하는 세부코드
-// 인증하는 방법은 Strategy라고 함
 passport.use(new LocalStrategy({
   usernameField: 'id',
   passwordField: 'pw',
-  // 로그인 후 세션을 저장할것인지
   session: true,
-  // 사용자의 다른정보 검증시 true로 바꾸면 매개변수를 하나 더 넣을수있다. req로 넣어서 req.body하면 볼수있음
   passReqToCallback: false,
 }, function (id, password, done) {
   console.log(id, password);
-  db.collection('login').findOne({ id: id }, function (error, result) {
+  // DB에 입력한 아이디가 맞는지 확인
+  database.collection('login').findOne({ id: id }, function (error, result) {
     if (error) return done(error)
-
     if (!result) return done(null, false, { message: '존재하지않는 아이디요' })
     if (password == result.pw) {
+      // 모든게 다 맞아서 사용자DB데이터를 담는것
       return done(null, result)
     } else {
       return done(null, false, { message: '비번틀렸어요' })
     }
   })
 }));
+
+// 세션 만들기
+passport.serializeUser((user, done) => {
+  done(null, user.id)
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, {})
+});
+
