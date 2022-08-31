@@ -213,3 +213,69 @@
       미들웨어라고 요청과 응답사이에 동작하는 코드인데
       static파일을 보관하기 위해 public폴더를 쓸것이다라고 얘기.
     */
+
+    /*
+      
+      var database
+      MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?retryWrites=true&w=majority', { useUnifiedTopology: true },function(error, client){
+        if(error) return console.log(error);
+      
+        database = client.db('todoapp')
+
+        app.listen(7777, function(){
+          console.log('listening on 7777')
+        });
+      })  
+
+      서버 띄울때 처음 작성했던 코드인데 여기보면 7777 이라는 포트번호, mongodb+srv라는 DB접속 문자열이 존재한다.
+      이런값들은 다른 개발환경이나 다른 컴퓨터로 코드를 옮긴다면 수정이 필요해질수도있다
+
+      - 다른컴퓨터에서 7777 포트를 연다던지
+      - 나중에 DB 이사를 가서 DB접속 문자열이 바뀐다든지 
+      - 아니면 다른 팀원들과 share해야하는데 내 아이디 비번이 적혀있던지
+
+      이런 환경에 따라 가변적인 변수데이터들을 보통 * 환경변수 * 라고 한다.
+      environment variable
+
+      그래서 미래를 생각하는 코딩을 하기위해 환경변수를 한곳에 모아서 관리한다
+      .env파일이라는 곳에 모든 중요한 환경변수를 넣은뒤에
+      server.js에 가서  ".env파일에 있는 포트숫자를 여기에 넣어주세요 " 이런식으로 코딩한다
+      이 경우 server.js 파일이 털릴 경우에도 중요한 정보들은 env에 있기때문에
+      보안상 이점이 있을 수 있다.
+
+      사용방법
+
+      1. npm install dotenv 라이브러리 설치
+
+      2. 환경변수가 있는 server.js에 방금 설치한 라이브러리를 등록
+      require('dotenv').config()
+
+      3. server.js와 같은 경로에 .env파일을 만듬
+      PORT=7777
+      DB_URL="mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?retryWrites=true&w=majority"
+
+      변수들이름은 보통 대문자로 표기
+      여기에 모아놓으면 나중에 이 파일만 수정하면 되니 관리도 편해지고 나중에 작업환경이 바뀌거나 클라우드에
+      올릴 때에도 이것만 변경해주면 환경셋팅 가능
+
+      4. 환경변수들을 server.js에 불러오기
+      server.js에서 env파일의 변수들을 불러올때에는 process.env.변수이름 으로사용가능
+
+      var database
+      MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true },function(error, client){
+        if(error) return console.log(error);
+      
+        database = client.db('todoapp')
+
+        app.listen(process.env.PORT, function(){
+          console.log('listening on 7777')
+        });
+      })
+
+
+      * https://cloud.google.com/appengine/docs/standard/nodejs/config/appref#environment_variables
+      이런곳을 참고해서 환경변수를 제작하면 된다
+      다만 변수 만드는 문법에 등호대신 콜론을 쓴다.
+
+
+    */

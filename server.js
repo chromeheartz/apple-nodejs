@@ -7,6 +7,8 @@ const { countReset } = require('console');
 app.use(bodyParser.urlencoded({extended : true}));
 const MongoClient = require('mongodb').MongoClient;
 const methodOverride = require('method-override');
+// 환경변수
+require('dotenv').config()
 app.use(methodOverride('_method'))
 app.set('view engine', 'ejs');
 
@@ -14,12 +16,12 @@ app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));
 
 var database
-MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?retryWrites=true&w=majority', { useUnifiedTopology: true },function(error, client){
+MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true },function(error, client){
   if(error) return console.log(error);
  
   database = client.db('todoapp')
 
-  app.listen(7777, function(){
+  app.listen(process.env.PORT, function(){
     console.log('listening on 7777')
   });
 })
