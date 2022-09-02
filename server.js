@@ -169,3 +169,18 @@ passport.deserializeUser((id, done) => {
   })
 });
 
+// 서버에서 query string 꺼내는법
+app.get('/search', (req, res) => {
+  
+  /*
+    req.body 는 form태그로 post요청할떄의 정보들이 들어있는데
+    query string은 req.query를 쳐서보면된다
+
+    find({title : req.query.value}로 하면 정확히 맞는것만 찾아줌
+  */
+  console.log(req.query.value)
+  database.collection('post').find({title : req.query.value}).toArray((error, result) => {
+    // 찾은결과를 잘 가져오고있음
+    console.log(result)
+  })
+})

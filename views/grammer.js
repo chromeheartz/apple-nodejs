@@ -279,3 +279,25 @@
 
 
     */
+
+    /*
+      Search
+
+      POST로 하게되면 
+      - 검색버튼 누르면 서버에게 요청
+      - 서버는 DB에서 데이터 꺼내주고 그걸로 ejs보내고 뿌려주면 끝
+  
+      하나찾을때 collection().findOne()
+      많이찾을때 collection().find().toArray()
+
+      GET
+  
+      GET요청으로도 서버에 데이터 전달 가능
+      GET할때는 URL만 잘 작성하면 끝. 
+      URL안에 정보를 포함시켜서 보내줄수있음
+  
+      ?where=nextalsdk&sm=top=토마토 예를들어 이렇게 뒤에붙는것을
+      query string이라고한다
+
+
+    */

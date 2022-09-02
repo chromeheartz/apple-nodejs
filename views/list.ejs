@@ -24,6 +24,12 @@
   -->
 
   <h4 class="ml-2 my-3 text-center">서버에서 가져올 리스트</h4>
+
+  <div class="container input-group mb-2">
+    <input class="form-control" id="search-input">
+    <button class="input-group-append btn btn-danger" id="search">검색</button>
+  </div>
+
   <div class="container">
     <ul class="list-group">
       <% for(var i = 0; i < posts.length; i++) { %>
@@ -67,6 +73,16 @@
       })
     })
 
+  </script>
+
+  <!-- GET -->
+  <script>
+    $('#search').click(function(){
+      // 현재 페이지 url을 바꾸는법(실은 GET요청이랑 똑같다)
+      // GET요청시 query string으로 정보전달하기
+      var searchValue = $('#search-input').val() // input값
+      window.location.replace('/search?value=' + searchValue)
+    })
   </script>
   
 
