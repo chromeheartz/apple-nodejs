@@ -84,6 +84,20 @@
       var searchValue = $('#search-input').val() // input값
       window.location.replace('/search?value=' + searchValue)
     })
+
+    /*
+        query string 만들때 이렇게 쓰면 쉬움
+
+        var 자료 = { 이름 : '값', 이름2 : '값2'}
+        $.param(자료)
+        
+        이렇게 오브젝트를 넣으면 query string이 나온다 혹은
+
+        $(폼태그).serialize() 
+        이렇게 붙이면 자리에 query string을 남겨준다
+        모든 input태그들을 일렬로 쭉 나열해준다.
+
+    */
   </script>
   
 

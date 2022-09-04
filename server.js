@@ -171,9 +171,27 @@ passport.deserializeUser((id, done) => {
 
 // 서버에서 query string 꺼내는법
 app.get('/search', (req, res) => {
+  // new Date() 날짜별로 쿼리줄때 사용
   console.log(req.query.value)
   // binary search를 사용하기위한 indexing작업 필수
-  database.collection('post').find({title : req.query.value}).toArray((error, result) => {
+  var searchInfo = [
+    {
+      $search: {
+        index: 'titleSearch',
+        text: {
+          query: req.query.value,
+          path: 'title'  // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+        }
+      }
+    },
+    // 검색조건 추가
+    {
+      // 어떤순서로정리할지, 1또는 -1로 오름 내림이 됨
+      $sort : { _id : 1}
+    },
+    { $project : { title : 1, _id : 0, score : { $meta : "searchScore"}}}
+  ]
+  database.collection('post').aggregate(searchInfo).toArray((error, result) => {
     // 찾은결과를 잘 가져오고있음
     console.log(result)
     res.render('search.ejs', { posts : result})

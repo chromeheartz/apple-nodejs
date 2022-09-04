@@ -364,7 +364,7 @@ passport.deserializeUser((id, done) => {
 
 // 서버에서 query string 꺼내는법
 app.get('/search', (req, res) => {
-  
+  // new Date() 날짜별로 쿼리줄때 사용
   /*
     req.body 는 form태그로 post요청할떄의 정보들이 들어있는데
     query string은 req.query를 쳐서보면된다
@@ -373,7 +373,27 @@ app.get('/search', (req, res) => {
   */
   console.log(req.query.value)
   // binary search를 사용하기위한 indexing작업 필수
-  database.collection('post').find({title : req.query.value}).toArray((error, result) => {
+  var searchInfo = [
+    {
+      $search: {
+        index: 'titleSearch',
+        text: {
+          query: req.query.value,
+          path: 'title'  // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+        }
+      }
+    },
+    // 검색조건 추가
+    {
+      // 어떤순서로정리할지, 1또는 -1로 오름 내림이 됨
+      $sort : { _id : 1}
+    },
+    // {$limit : 10} 상위 10개만 가져와주세요
+    // 검색결과에서 필터주기 0은 안가져오고 1은 가져오기
+    // { $project : { title : 1, _id : 0, score : { $meta : "searchScore"}}}
+
+  ]
+  database.collection('post').aggregate(searchInfo).toArray((error, result) => {
     // 찾은결과를 잘 가져오고있음
     console.log(result)
     res.render('search.ejs', { posts : result})

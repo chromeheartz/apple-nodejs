@@ -336,3 +336,29 @@
     정규식을쓸때 '이닦기'인것을 찾아달라고 명령을 주면 index를 사용하고
     '이닦기'가 포함된것을 다 찾아달라고하면 index를 사용하지않는다.
   */
+
+  /*
+    find({title : req.query.value}) 에서 index만들어둔것으로 확인하기위해 바꿈
+    $text : { $search : req.query.value } text와 search 연산자로 
+
+    text index 만들어두면
+    1. 빠른검색
+    2. or 검색가능
+    3. - 제외가능
+    4. "정확히 일치하는것만"
+
+    text index 문제점은 한글친화적이지않음
+    띄어쓰기를 기준으로 단어를 저장하기때문에 해결책이 3가지정도있다
+
+    1. text index를 쓰지않고 검색할 문서의 양에 제한을두는것
+    맨앞 1000개중에서만 찾아봐라 , 오늘부터 일주일간 발행된게시물에서찾아봐라
+
+    2. text index 만들때 다르게 만들기 
+    알고리즘을 띄어쓰기 단위로 indexing 금지하고 글자 두개단위로 indexing해봐라(nGram)
+
+    3. search index 만들기
+    lucene.korean 으로 해석기를 한국어기준으로바꾸기
+
+    find({ $text : { $search : req.query.value } }) 기존의 find를 빼고 수정
+    aggregate([{},{},{}]) 검색조건을 달 수있다 data pipe line 이라고부름
+  */
