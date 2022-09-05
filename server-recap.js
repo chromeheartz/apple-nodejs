@@ -66,47 +66,6 @@ app.get('/', (req, res) => {
 });
 
 
-app.post('/add', (req, res) => {
-  // 서버창에 데이터가 전달이된다.
-  // console.log(req.body.title)
-
-  // 이부분은 항상 존재해야한다. 전송이 실패하든 성공하든 뭔가 서버에서 보내주어야함.
-  // 메세지 보내주기 싫다면 간단한 응답코드나 리다이렉트(페이지강제이동)를 해주는 코드도있다
-  res.send('add complete')
-  /*
-    autto increment db에 뭔가 추가될때마다 자동으로 증가시켜서 저장하는 그런것들 
-    하지만 총 개시물 갯수 +1 은 좋은것은 아니다. _id가 영구적으로 남아있게 유니크하게 지정하는것이좋다
-
-    다른 collection을 만들어 파일을 관리한다. 발행된 총 게시물 갯수를 기록하는 저장공간
-    insert document로 데이터의 이름, 값을 채워넣으면 된다.
-
-    totalPost는 지금까지 발행된 총 게시물 갯수를 기록
-    counter라는 collection에서 name이 게시물갯수인것을 찾아주세요 라는 뜻.
-  */
-  database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
-    // console.log(result.totalPost);
-    let totalPost = result.totalPost;
-    database.collection('post').insertOne({ _id : totalPost + 1, date : req.body.date, title : req.body.title}, function(error, result) {
-      console.log('save complete');
-      /*
-        id 발행 후 총개시물갯수 증가 mongoDb에서 어떤값을 수정할때 쓰는것 updateOne
-        많이 수정할때는 updateMany 3번째 함수는 안써도됨
-        (어떤데이터를수정할지, 수정값을입력,)
-        업데이트류의 함수를 쓸떄는 operator를 써야한다.
-        중괄호를 하나 더열어서 담아주고 
-        $set 이 update operator이다.
-        $set(변경), $inc(증가), $min(기존값보다 적을때만 변경), $rename (key값 이름변경) 등이있음.
-
-        콜백함수에서 쓸때는 업데이트를 시켜주고, 완료가되면 안에있는 코드를 실행해주세요.맥락으로쓸것.
-        에러체킹 혹은 결과값 반환받기 등등.
-      */
-      database.collection('counter').updateOne({name : "게시물갯수"}, { $inc : {totalPost : 1}}, function(error, result){
-        if(error) return console.log(error)
-      })
-    })
-  });
-})
-
 // 리액트로 데이터바인딩 해보는법을 찾아보는것도 좋다.
 
 // list로 접속(get)요청하면 실제 DB에 저장된 데이터들로 데이터들을 보여줄것.
@@ -133,36 +92,6 @@ app.get('/list', (req, res) => {
   });
   
 })
-
-// delete 경로로 DELETE요청을 처리하는 코드
-app.delete('/delete', (req, res) => {
-  // 요청시 함꼐 보낸데이터를 찾는법.
-  console.log(req.body)
-  /*
-    deleteOne 은 삭제해주는 함수
-    첫번째 인자로는 query문을쓴다. 어떤항목을 삭제할지.
-    두번째 인자로는 요청이 끝난후에 실행할 콜백함수
-    database.collection('post').deleteOne(req.body, function(error,result){
-      console.log('delete complete')
-    })
-    ajax에서 요청한 데이트가 data : {_id : 1} 이면 {_id : 1}이
-    req.body에 들어가게되니 실제로는 {_id : 1}인것을 찾아서 지워달라는 말이되는것이다.
-    현재상태에서는 삭제가 안되지만 자료형이 조금달라서 삭제가안되는것이다.
-    실제 데이터베이스에서는 1이고 우리가 보낼것은 '1'이라서 number, string이 달라서그렇다
-
-    우리가 number를 보냈는데 왜 문자로 보내지는것일까. 간혹 치환이되는경우가있어서
-    값을 숫자로 변환시켜주어야한다.
-  */
-  // 숫자로변환한것을 다시 넣어줌
-  req.body._id = parseInt(req.body._id)
-  database.collection('post').deleteOne(req.body, function(error,result){
-    console.log('delete complete')
-    // 응답코드 200을 보내주세요 요청성공. 400은 고객잘못으로 요청실패라는뜻, 500은 서버문제요청실패
-    // .send는 서버에서 메시지를 보낼때 쓰는 함수. 글자만써도되고 object로 넣어도됨
-    res.status(200).send({ message : 'complete' });
-  })
-})
-
 
 /*
   /detail/ 이후에 들어가는 게시물 번호에 따라 맞는 상세페이지 보내주기
@@ -360,6 +289,96 @@ passport.deserializeUser((id, done) => {
     done(null, result) // result 는 id: bibiboy, pw : test 이렇게 들어오는것
   })
 });
+
+app.post('/add', (req, res) => {
+  // 서버창에 데이터가 전달이된다.
+  // console.log(req.body.title)
+
+  // 이부분은 항상 존재해야한다. 전송이 실패하든 성공하든 뭔가 서버에서 보내주어야함.
+  // 메세지 보내주기 싫다면 간단한 응답코드나 리다이렉트(페이지강제이동)를 해주는 코드도있다
+  res.send('add complete')
+  /*
+    autto increment db에 뭔가 추가될때마다 자동으로 증가시켜서 저장하는 그런것들 
+    하지만 총 개시물 갯수 +1 은 좋은것은 아니다. _id가 영구적으로 남아있게 유니크하게 지정하는것이좋다
+
+    다른 collection을 만들어 파일을 관리한다. 발행된 총 게시물 갯수를 기록하는 저장공간
+    insert document로 데이터의 이름, 값을 채워넣으면 된다.
+
+    totalPost는 지금까지 발행된 총 게시물 갯수를 기록
+    counter라는 collection에서 name이 게시물갯수인것을 찾아주세요 라는 뜻.
+  */
+  database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
+    // console.log(result.totalPost);
+    let totalPost = result.totalPost;
+    /*
+      요청.user : 현재 로그인한 사람의 정보 들어있음
+      name 작성자, 이름, 아이디 등 모든 기록을 보내주면 좋을듯
+      현재 실제 유저의 유니크한 _id를 가지고있음. 그것을
+      login 컬렉션에 조회해보면 이름이 금방 나올것이다.
+
+      dennormalizing 찾아보기.
+    */
+    let saveItem = { _id : totalPost + 1,  name : req.user._id, date : req.body.date, title : req.body.title};
+
+    database.collection('post').insertOne(saveItem, function(error, result) {
+      console.log('save complete');
+      /*
+        id 발행 후 총개시물갯수 증가 mongoDb에서 어떤값을 수정할때 쓰는것 updateOne
+        많이 수정할때는 updateMany 3번째 함수는 안써도됨
+        (어떤데이터를수정할지, 수정값을입력,)
+        업데이트류의 함수를 쓸떄는 operator를 써야한다.
+        중괄호를 하나 더열어서 담아주고 
+        $set 이 update operator이다.
+        $set(변경), $inc(증가), $min(기존값보다 적을때만 변경), $rename (key값 이름변경) 등이있음.
+
+        콜백함수에서 쓸때는 업데이트를 시켜주고, 완료가되면 안에있는 코드를 실행해주세요.맥락으로쓸것.
+        에러체킹 혹은 결과값 반환받기 등등.
+      */
+      database.collection('counter').updateOne({name : "게시물갯수"}, { $inc : {totalPost : 1}}, function(error, result){
+        if(error) return console.log(error)
+      })
+    })
+  });
+})
+
+
+// delete 경로로 DELETE요청을 처리하는 코드
+/*
+  실제 로그인중인 유저의 _id와
+  글에 저장된 유저의 _id가 일치하면 삭제해주도록
+
+  let deleteData = { _id : req.body._id, name : req.user._id} 
+  이런식으로 서놓으면 첫번째와 두번쨰가 일치하는 사람을 찾아서 삭제를 해준다. 타겟팅이가능.
+*/
+app.delete('/delete', (req, res) => {
+  // 요청시 함꼐 보낸데이터를 찾는법.
+  console.log(req.body)
+  /*
+    deleteOne 은 삭제해주는 함수
+    첫번째 인자로는 query문을쓴다. 어떤항목을 삭제할지.
+    두번째 인자로는 요청이 끝난후에 실행할 콜백함수
+    database.collection('post').deleteOne(req.body, function(error,result){
+      console.log('delete complete')
+    })
+    ajax에서 요청한 데이트가 data : {_id : 1} 이면 {_id : 1}이
+    req.body에 들어가게되니 실제로는 {_id : 1}인것을 찾아서 지워달라는 말이되는것이다.
+    현재상태에서는 삭제가 안되지만 자료형이 조금달라서 삭제가안되는것이다.
+    실제 데이터베이스에서는 1이고 우리가 보낼것은 '1'이라서 number, string이 달라서그렇다
+
+    우리가 number를 보냈는데 왜 문자로 보내지는것일까. 간혹 치환이되는경우가있어서
+    값을 숫자로 변환시켜주어야한다.
+  */
+  // 숫자로변환한것을 다시 넣어줌
+  req.body._id = parseInt(req.body._id)
+  // 삭제할 데이터
+  var deleteData = { _id : req.body._id, name : req.user._id}
+  database.collection('post').deleteOne(deleteData, function(error,result){
+    console.log('delete complete')
+    // 응답코드 200을 보내주세요 요청성공. 400은 고객잘못으로 요청실패라는뜻, 500은 서버문제요청실패
+    // .send는 서버에서 메시지를 보낼때 쓰는 함수. 글자만써도되고 object로 넣어도됨
+    res.status(200).send({ message : 'complete' });
+  })
+})
 
 
 // 서버에서 query string 꺼내는법

@@ -30,21 +30,6 @@ app.get('/', (req, res) => {
   res.render('index.ejs');
 })
 
-app.post('/add', (req, res) => {
-  res.send('add complete')
-
-  database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
-    // console.log(result.totalPost);
-    let totalPost = result.totalPost;
-    database.collection('post').insertOne({ _id : totalPost + 1, date : req.body.date, title : req.body.title}, function(error, result) {
-      console.log('save complete');
-      database.collection('counter').updateOne({name : "게시물갯수"}, { $inc : {totalPost : 1}}, function(error, result){
-        if(error) return console.log(error)
-      })
-    })
-  });
-})
-
 app.get('/list', (req, res) => {
   database.collection('post').find().toArray(function(error, result){
     // console.log(result);
@@ -59,15 +44,6 @@ app.get('/write', (req, res) => {
     res.render('write.ejs', {posts : result});
   });
   
-})
-
-// delete 경로로 DELETE요청을 처리하는 코드
-app.delete('/delete', (req, res) => {
-  req.body._id = parseInt(req.body._id)
-  database.collection('post').deleteOne(req.body, function(error,result){
-    console.log('delete complete')
-    res.status(200).send({ message : 'complete' });
-  })
 })
 
 // **** 이부분 이해하는것 중요.
@@ -168,6 +144,54 @@ passport.deserializeUser((id, done) => {
     done(null, result)
   })
 });
+
+/*
+  가입폼, 유저 로그인했을떄에 대한 개발을 할것인데 회원기능이 필요하면
+  passport세팅하는부분이 위에있어야함
+
+  현재는 요청하는 대로 바로 저장을 하는데 아이디중복검사는 해야한다
+  저장전에 id가 있는지 먼저 찾아볼것이다. 알파벳 숫자만 잘들어있는지 정규식으로
+  비밀번호 저장 전에 암호화했는지
+
+  * 현재 해야할것은 아이디가 중복인지 먼저 확인하는 코드를 만들어볼것
+*/
+app.post('/register', (req, res) => {
+  database.collection('login').insertOne({ id : req.body.id, pw : req.body.pw}, (error, result) => {
+    res.redirect('/')
+  })
+})
+
+
+// 글 등록하는기능
+app.post('/add', (req, res) => {
+  res.send('add complete')
+
+  database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
+    // console.log(result.totalPost);
+    let totalPost = result.totalPost;
+    let saveItem = { _id : totalPost + 1,  name : req.user._id, date : req.body.date, title : req.body.title};
+    
+    database.collection('post').insertOne(saveItem, function(error, result) {
+      console.log('save complete');
+      database.collection('counter').updateOne({name : "게시물갯수"}, { $inc : {totalPost : 1}}, function(error, result){
+        if(error) return console.log(error)
+      })
+    })
+  });
+})
+
+// delete 경로로 DELETE요청을 처리하는 코드
+app.delete('/delete', (req, res) => {
+  req.body._id = parseInt(req.body._id)
+  // 삭제할 데이터
+  var deleteData = { _id : req.body._id, name : req.user._id}
+  database.collection('post').deleteOne(deleteData, function(error,result){
+    console.log('delete complete')
+    if (result) {console.log(result)};
+    res.status(200).send({ message : 'complete' });
+  })
+})
+
 
 // 서버에서 query string 꺼내는법
 app.get('/search', (req, res) => {
