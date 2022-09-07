@@ -7,6 +7,7 @@ const { countReset } = require('console');
 app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require('mongodb').MongoClient;
 const methodOverride = require('method-override');
+
 // 환경변수
 require('dotenv').config()
 app.use(methodOverride('_method'))
@@ -227,3 +228,31 @@ app.get('/search', (req, res) => {
 // app.use(미들웨어)
 app.use('/shop', require('./routes/shop.js'));
 app.use('/board/sub', require('./routes/board.js'));
+
+// multer
+let multer = require('multer');
+var storage = multer.diskStorage({
+  // 업로드한 이미지의 경로를 설정
+  destination: function (req, file, cb) {
+    cb(null, './public/image')
+  },
+  // 저장한 이미지의 파일이름을 설정하는부분
+  filename: function (req, file, cb) {
+    cb(null, file.originalname) // + new Date() +로 문자를 담던 파일명을 다이나믹하게바꿀수있음
+  }
+})
+
+var upload = multer({ storage: storage });
+
+app.get('/upload', (req, res) => {
+  res.render('upload.ejs')
+})
+
+app.post('/upload', upload.single('picture'), (req, res) => {
+  res.send('완료')
+})
+
+// 업로드한 이미지 보여주기
+app.get('/image/:imageName', (req, res) => {
+  res.sendFile(__dirname + '/public/image' + req.params.imageName)
+})

@@ -9,7 +9,7 @@ const app = express();
 
 // bodyparser 선언
 const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended : true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require('mongodb').MongoClient;
 // form태그에서 put, delete를 하기위한 라이브러리
 const methodOverride = require('method-override');
@@ -19,9 +19,9 @@ app.set('view engine', 'ejs');
 
 // 어떤 데이터베이스에 넣을지
 var database
-MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?retryWrites=true&w=majority', { useUnifiedTopology: true },function(error, client){
+MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?retryWrites=true&w=majority', { useUnifiedTopology: true }, function (error, client) {
   // 실제로 접속을 확인해볼것임 접속이완료가되면 nodejs 서버띄우는 코드를 실행
-  if(error) return console.log(error);
+  if (error) return console.log(error);
 
   // todoapp이라는 database(폴더)에 연결해달라는뜻.
   database = client.db('todoapp')
@@ -41,11 +41,11 @@ MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?r
     안적으면 강제로 부여가됨
   */
 
-  database.collection('post').insertOne({name : "bibi", age : 30}, function(error, result){
+  database.collection('post').insertOne({ name: "bibi", age: 30 }, function (error, result) {
     console.log('save complete');
   });
 
-  app.listen(7777, function(){
+  app.listen(7777, function () {
     console.log('listening on 7777')
   });
 })
@@ -54,7 +54,7 @@ MongoClient.connect('mongodb+srv://bibi:1q2w3e4r@cluster0.8gtuh5t.mongodb.net/?r
 
 // app.get()은 두개의 파라미터가 들어간다. 경로, 띄워줄함수  function에는 (요청 request,응답 response)
 // 응답.send('.....')
-app.get('/beauty', function(req, res){
+app.get('/beauty', function (req, res) {
   res.send('뷰티페이지에욤')
 });
 
@@ -74,7 +74,7 @@ app.get('/', (req, res) => {
 app.get('/list', (req, res) => {
   // database의 데이터를 꺼냄. post라는 collection의 어떤것을 빼달라.
   // find().toArray()를쓰면 모든것들을 가져올수있지만 메타데이터도 들어옴
-  database.collection('post').find().toArray(function(error, result){
+  database.collection('post').find().toArray(function (error, result) {
     console.log(result);
     /*
       Failed to lookup view "list.ejs
@@ -88,9 +88,9 @@ app.get('/list', (req, res) => {
       list.ejs 파일을 렌더링함과 동시에 {posts : result}라는 데이터를 함께 보내줄수있다.
       * 정확히말하면 result 라는 데이터를 posts라는 이름으로 ejs 파일에 보내달라고한것
     */
-    res.render('list.ejs', {posts : result});
+    res.render('list.ejs', { posts: result });
   });
-  
+
 })
 
 /*
@@ -104,23 +104,23 @@ app.get('/list', (req, res) => {
 app.get('/detail/:id', (req, res) => {
   // db에서 원하는데이터찾기
   // req.params.id URL의 parameter중에 id를 넣어주세요 라는뜻
-  database.collection('post').findOne({_id : parseInt(req.params.id)}, function (error, result){
+  database.collection('post').findOne({ _id: parseInt(req.params.id) }, function (error, result) {
     // 서버에 null이 뜰때 query문 날린것을 잘 확인해보아야함. 지금 database에 있는데 null이 나온다는것은
     // 자료형이 달라서그렇다. Number()로 넣어주어도 되고 parseInt해줘도됨
     console.log(result);
     // 두번째인자 중요. result라는 데이터를 data라는 이름으로 보내주세요 (ejs파일로 데이터 보내는법)
-    res.render('detail.ejs', { data : result})
+    res.render('detail.ejs', { data: result })
   })
 })
 
 // edit페이지를 만들고 실제게시물이 없는 파라미터일경우에 404페이지 출력.
-app.get('/edit/:id', (req,res) => {
+app.get('/edit/:id', (req, res) => {
   // id로 들어오는 게시물의 제목과 날짜를 edit.ejs로 보냄.
   // findeOne안에 어떤 데이터를 찾고싶은지 query문을 넣음
-  database.collection('post').findOne({_id : parseInt(req.params.id)}, function(error, result){
+  database.collection('post').findOne({ _id: parseInt(req.params.id) }, function (error, result) {
     console.log(result);
-    if(result) {
-      res.render('edit.ejs', { post : result })
+    if (result) {
+      res.render('edit.ejs', { post: result })
     } else {
       res.render('error.ejs')
     }
@@ -136,7 +136,7 @@ app.get('/edit/:id', (req,res) => {
   
 */
 
-app.put('/edit', (req,res) => {
+app.put('/edit', (req, res) => {
   /*
     updateOne은 어떤 게시물을 찾아서 하나만 업데이트시켜준다,
     (어떤게시물수정할건지, 수정값, 콜백함수)
@@ -153,7 +153,7 @@ app.put('/edit', (req,res) => {
     몰래보낸 post._id 데이터를 서버에서 꺼내는법.
     req.body.id input중에 name이 id인것을 보내주세요. 하는것.
   */
-  database.collection('post').updateOne({ _id : parseInt(req.body.id) }, { $set : {title : req.body.title, date : req.body.date}}, (error, result) => {
+  database.collection('post').updateOne({ _id: parseInt(req.body.id) }, { $set: { title: req.body.title, date: req.body.date } }, (error, result) => {
     console.log('edit complete')
     // 변경후에 다른페이지로 이동을 한다던지 해야함.
     res.redirect('/list')
@@ -172,7 +172,7 @@ const session = require('express-session');
 // 미들웨어 설정
 // 미들웨어 : 요청 - 응답 중간에 뭔가 실행되는 코드
 // secret 의 value는 세션을 만들떄의 비밀번호가됨.
-app.use(session({secret: '비밀코드', resave : true, saveUninitialized : false}));
+app.use(session({ secret: '비밀코드', resave: true, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -184,7 +184,7 @@ app.get('/login', (req, res) => {
 // authenticate는 인증해달라는것. local이라는 방식으로 회원인지 인증해달라는뜻
 // 성공을하고 중괄호를 넣어놓으면 세팅을 할 수 있음. failureRedirect 실패했을시에 이 경로로 이동시켜주라는뜻
 app.post('/login', passport.authenticate('local', {
-  failureRedirect : '/fail'
+  failureRedirect: '/fail'
 }), (req, res) => {
   // 로그인 요청시 실행될코드들
   // 회원인증 성공하면 redirect /여기로 보내달라는뜻
@@ -199,14 +199,14 @@ app.post('/login', passport.authenticate('local', {
 app.get('/mypage', isLogined, (req, res) => {
   console.log(req.user)
   // 찾은 유저정보를 mypage.ejs에 보냄
-  res.render('mypage.ejs', {user : req.user})
+  res.render('mypage.ejs', { user: req.user })
 });
 
 // 이 사람이 로그인한 데이터가 있어야 마이페이지로 보내져야하니 미들웨어같은 함수를 하나만든다.
 function isLogined(req, res, next) {
   // 마이페이지 접속 전 실행할 미들웨어
   // 로그인 후 세션이 있으면 요청.user가 항상있음. 출력해서 확인해보기
-  if(req.user) {
+  if (req.user) {
     // 다음으로 통과
     next()
   } else {
@@ -273,7 +273,7 @@ passport.serializeUser((user, done) => {
   세션을 찾을때
   user.id가 매개변수의 첫번째 자리로 들어오니 그것을 기반으로 findOne을 할 수있다
 */
-passport.deserializeUser((id, done) => { 
+passport.deserializeUser((id, done) => {
   /*
     user.id로 유저를 찾은뒤에 유저 정보를
     done(null, {})의 {}에 넣음
@@ -285,7 +285,7 @@ passport.deserializeUser((id, done) => {
     마이페이지 접속시 DB에서 {id : 어쩌구, ...}인걸 찾아서 그 결과를 보내줌 
     그 결과는 마이페이지 접속할때 요청.user 로 들어오게 된다
   */
-  database.collection('login').findOne({id : id}, function(error, result){
+  database.collection('login').findOne({ id: id }, function (error, result) {
     done(null, result) // result 는 id: bibiboy, pw : test 이렇게 들어오는것
   })
 });
@@ -307,7 +307,7 @@ app.post('/add', (req, res) => {
     totalPost는 지금까지 발행된 총 게시물 갯수를 기록
     counter라는 collection에서 name이 게시물갯수인것을 찾아주세요 라는 뜻.
   */
-  database.collection('counter').findOne({name : "게시물갯수"}, function(error, result){
+  database.collection('counter').findOne({ name: "게시물갯수" }, function (error, result) {
     // console.log(result.totalPost);
     let totalPost = result.totalPost;
     /*
@@ -318,9 +318,9 @@ app.post('/add', (req, res) => {
 
       dennormalizing 찾아보기.
     */
-    let saveItem = { _id : totalPost + 1,  name : req.user._id, date : req.body.date, title : req.body.title};
+    let saveItem = { _id: totalPost + 1, name: req.user._id, date: req.body.date, title: req.body.title };
 
-    database.collection('post').insertOne(saveItem, function(error, result) {
+    database.collection('post').insertOne(saveItem, function (error, result) {
       console.log('save complete');
       /*
         id 발행 후 총개시물갯수 증가 mongoDb에서 어떤값을 수정할때 쓰는것 updateOne
@@ -334,8 +334,8 @@ app.post('/add', (req, res) => {
         콜백함수에서 쓸때는 업데이트를 시켜주고, 완료가되면 안에있는 코드를 실행해주세요.맥락으로쓸것.
         에러체킹 혹은 결과값 반환받기 등등.
       */
-      database.collection('counter').updateOne({name : "게시물갯수"}, { $inc : {totalPost : 1}}, function(error, result){
-        if(error) return console.log(error)
+      database.collection('counter').updateOne({ name: "게시물갯수" }, { $inc: { totalPost: 1 } }, function (error, result) {
+        if (error) return console.log(error)
       })
     })
   });
@@ -371,12 +371,12 @@ app.delete('/delete', (req, res) => {
   // 숫자로변환한것을 다시 넣어줌
   req.body._id = parseInt(req.body._id)
   // 삭제할 데이터
-  var deleteData = { _id : req.body._id, name : req.user._id}
-  database.collection('post').deleteOne(deleteData, function(error,result){
+  var deleteData = { _id: req.body._id, name: req.user._id }
+  database.collection('post').deleteOne(deleteData, function (error, result) {
     console.log('delete complete')
     // 응답코드 200을 보내주세요 요청성공. 400은 고객잘못으로 요청실패라는뜻, 500은 서버문제요청실패
     // .send는 서버에서 메시지를 보낼때 쓰는 함수. 글자만써도되고 object로 넣어도됨
-    res.status(200).send({ message : 'complete' });
+    res.status(200).send({ message: 'complete' });
   })
 })
 
@@ -405,7 +405,7 @@ app.get('/search', (req, res) => {
     // 검색조건 추가
     {
       // 어떤순서로정리할지, 1또는 -1로 오름 내림이 됨
-      $sort : { _id : 1}
+      $sort: { _id: 1 }
     },
     // {$limit : 10} 상위 10개만 가져와주세요
     // 검색결과에서 필터주기 0은 안가져오고 1은 가져오기
@@ -415,6 +415,73 @@ app.get('/search', (req, res) => {
   database.collection('post').aggregate(searchInfo).toArray((error, result) => {
     // 찾은결과를 잘 가져오고있음
     console.log(result)
-    res.render('search.ejs', { posts : result})
+    res.render('search.ejs', { posts: result })
   })
 })
+
+
+
+
+
+// multer
+let multer = require('multer');
+/*
+  diskStorage는 일반 하드 같은 폴더안에 저장해달라는뜻
+  memoryStorage는 RAM에 저장해달라는뜻
+*/
+var storage = multer.diskStorage({
+  // 업로드한 이미지의 경로를 설정
+  destination: function (req, file, cb) {
+    cb(null, './public/image')
+  },
+  // 저장한 이미지의 파일이름을 설정하는부분
+  filename: function (req, file, cb) {
+    cb(null, file.originalname) // + new Date() +로 문자를 담던 파일명을 다이나믹하게바꿀수있음
+  }
+})
+
+var upload = multer({ storage: storage });
+/*
+  var path = require('path');
+
+  var upload = multer({
+      storage: storage,
+      fileFilter: function (req, file, callback) {
+          var ext = path.extname(file.originalname);
+          if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
+              return callback(new Error('PNG, JPG만 업로드하세요'))
+          }
+          callback(null, true)
+      },
+      limits:{
+          fileSize: 1024 * 1024
+      }
+  });
+
+  셋팅하는 부분안에 fileFilter라는 항목을 추가해주면 파일 형식 자르기도 가능.
+  path라는 변수는 nodejs 기본 내장 라이브러리 path 라는것을 활용해 파일의 경로, 이름, 확장자 등을 알아낼 때 사용
+  위의 예제에서는 업로드한 파일의 확장자를 알아내서 png랑 맞는지 확인, 비교하는 과정
+*/
+
+app.get('/upload', (req, res) => {
+  res.render('upload.ejs')
+})
+
+/*
+  업로드한 이미지 폴더안에 저장. 편하게 사용위해 라이브러리 설치
+  multer를 미들웨어로 동작시키기
+  single 이라고 쓰고 Input의 name속성으로 어떤것의 파일을 받아올것인지 쓴다
+  single이라고 한것을 array라고 쓰고 (input의 name속성, 한번에받을최대갯수)라고 써주면된다
+  
+  그럴려면 인풋을 여러개 파일을 선택할 수 있는 인풋으로 바꾸면된다.
+*/
+app.post('/upload', upload.single('picture'), (req, res) => {
+  res.send('완료')
+})
+
+// 업로드한 이미지 보여주기, 이걸로 프로필 사진 만들어보기
+app.get('/image/:imageName', (req, res) => {
+  res.sendFile(__dirname + '/public/image' + req.params.imageName)
+})
+
+{/* <img src="/image/yosigo.jpg"> 추후에 이런식으로 기능개발해도됨 */ }
