@@ -275,6 +275,10 @@ app.get('/image/:imageName', (req, res) => {
   res.sendFile(__dirname + '/public/image' + req.params.imageName)
 })
 
-app.get('/chat', (req, res) => {
-  res.render('chat.ejs')
+app.get('/chat', isLogined, (req, res) => {
+  // db에서 데이터받아오기, array안에 하나를 찾는것이면 그냥 find로도 가능
+  database.collection('chatroom').find({ member: req.user._id }).toArray().then((result) => {
+    // 성공시에 렌더
+    res.render('chat.ejs', { data: result })
+  })
 })
