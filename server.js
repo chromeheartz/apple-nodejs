@@ -8,6 +8,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require('mongodb').MongoClient;
 const methodOverride = require('method-override');
 
+const { ObjectId } = require('mongodb');
+
 // 환경변수
 require('dotenv').config()
 app.use(methodOverride('_method'))
@@ -113,6 +115,22 @@ function isLogined(req, res, next) {
   }
 
 }
+
+
+// post 요청시 채팅방 게시물 발행
+app.post('/chatroom', isLogined, (req, res) => {
+
+  var saveMon = {
+    title: 'chatTitle',
+    member: [ObjectId(req.body.resUserId), req.user._id],
+    date: new Date()
+  }
+
+  // 콜백함수 대신 then으로 사용가능
+  database.collection('chatroom').insertOne(saveMon).then((result) => {
+    res.send('save complete')
+  });
+});
 
 // 아이디 비번 인증하는 세부코드
 passport.use(new LocalStrategy({
@@ -256,25 +274,6 @@ app.post('/upload', upload.single('picture'), (req, res) => {
 app.get('/image/:imageName', (req, res) => {
   res.sendFile(__dirname + '/public/image' + req.params.imageName)
 })
-
-/*
-
-  새로운 개념
-  - 게시물간 관계맺기
-  - DB 실시간 업데이트
-
-  채팅기능 == 댓글기능(+실시간)
-
-  댓글게시물은 무조건 부모게시물이 존재한다. 종속되어야한다는것.
-  Collection1 - 할일게시물 A, 할일게시물 B
-  Collection2 - 댓글게시물1 (부모 : 게시물 A ), 댓글게시물2 (부모 : 게시물A),
-                댓글게시물3 (부모 : 게시물 B)
-  이런 형태의 구조가 필요하다
-
-  이런것을 document끼리 관계를 맺는다고 한다.
-  글 & 댓글 == 채팅방 & 메세지
-
-*/
 
 app.get('/chat', (req, res) => {
   res.render('chat.ejs')
