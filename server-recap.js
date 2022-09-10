@@ -533,3 +533,19 @@ app.get('/chat', isLogined, (req, res) => {
     res.render('chat.ejs', { data: result })
   })
 })
+
+// 메세지보내기
+app.post('/message', isLogined, (req, res) => {
+  let saveData = {
+    parent: req.body.parent,
+    content: req.body.content,
+    userid: req.user._id,
+    date: new Date(),
+  }
+  database.collection('message').insertOne(saveData).then(() => {
+    console.log('DB저장 성공')
+    res.send('DB저장 성공')
+  }).catch(() => {
+    console.log('DB저장 실패')
+  })
+})

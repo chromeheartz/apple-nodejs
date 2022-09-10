@@ -53,7 +53,7 @@
         <div class="col-3">
           <ul class="list-group chat-list">
             <% for(let i=0; i < data.length; i++) { %>
-              <li class="list-group-item" data-id="">
+              <li class="list-group-item" data-id="<%= data[i]._id%>">
                 <h6>
                   <%= data[i].title %>
                 </h6>
@@ -89,6 +89,30 @@
   integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
   integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script>
+
+
+  $('#send').click(function () {
+    var chatContent = $('#chat-input').val();
+    var sendMessage = {
+      // 부모게시물 id
+      parent: thisChatId,
+      content: chatContent,
+    }
+    $.post('/message', sendMessage).then(() => {
+      console.log('send complette')
+    })
+  })
+
+  let thisChatId;
+
+  $('.list-group-item').click(function () {
+    $(this).css('background-color', "#eee");
+    thisChatId = $(this).attr('data-id');
+  })
+</script>
+
 </body>
 
 </html>
