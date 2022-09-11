@@ -105,11 +105,21 @@
     })
   })
 
-  let thisChatId;
+  let thisChatId, eventSource;
 
   $('.list-group-item').click(function () {
     $(this).css('background-color', "#eee");
     thisChatId = $(this).attr('data-id');
+
+    // get요청이랑같은데 실시간 api를 받기위한 특별한 get요청 방법이다
+    eventSource = new EventSource('/message/' + thisChatId)
+    eventSource.addEventListener('test', function (e) {
+      // 서버에서보낸데이터
+      console.log(e)
+      // json으로 바꿨던것을 다싯 바꿈 
+      // object, array 에 따옴표치면 JSON (JSON은 문자취급받음)
+      console.log(JSON.parse(e.data)) // 안녕하세요
+    })
   })
 </script>
 

@@ -549,3 +549,37 @@ app.post('/message', isLogined, (req, res) => {
     console.log('DB저장 실패')
   })
 })
+
+
+/*
+  실시간으로 DB 데이터 계속 가져오는법
+
+  1. get 요청 계속 날리기(서버는 요청 많으면 힘들어함)
+  짧은시간에 get 요청을 몇십만번하고 이런것을 Ddos 공격이라고함
+
+  2. 서버와 유저간 실시간 소통채널 열기(Server Sent Events)
+  서버가 일방적으로 데이터 실시간 전송가능
+
+  * get 요청시 서버로 데이터전송하려면
+  1. URL 파라미터
+  2. query string
+  
+*/
+app.get('/message/:parentid', isLogined, (req, res) => {
+
+  res.writeHead(200, {
+    "Connection": "keep-alive",
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+  });
+
+  // result에서는 array안에 obejct가 있는데 서버에서 실시간 전송시 문자자료만 전송가능해서 stringify를 쓴다
+  database.collection('message').find({ parent: req.params.parentid }).toArray().then((result) => {
+    console.log(result)
+    // 유저에게 데이터 전송. 어떤이름으로 데이터를 보낼것인지
+    res.write('event: test\n'); // 보낼데이터이름 \n 엔터키와같다고생각.
+    // 지금 누른 채팅방의 채팅메세지들
+    res.write(`data: ${JSON.stringify(결과)}\n\n`); // 보낼데이터
+  })
+
+});
