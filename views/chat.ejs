@@ -108,17 +108,47 @@
   let thisChatId, eventSource;
 
   $('.list-group-item').click(function () {
-    $(this).css('background-color', "#eee");
+    // $(this).css('background-color', "#eee");
+    // 내용 비우기
+    $('.chat-content').html('')
     thisChatId = $(this).attr('data-id');
+
+    // 소통채널 나가기
+    if (eventSource != undefined) {
+      eventSource.close()
+    }
 
     // get요청이랑같은데 실시간 api를 받기위한 특별한 get요청 방법이다
     eventSource = new EventSource('/message/' + thisChatId)
     eventSource.addEventListener('test', function (e) {
-      // 서버에서보낸데이터
-      console.log(e)
-      // json으로 바꿨던것을 다싯 바꿈 
-      // object, array 에 따옴표치면 JSON (JSON은 문자취급받음)
-      console.log(JSON.parse(e.data)) // 안녕하세요
+      /*
+        서버에서보낸데이터
+        console.log(e)
+        json으로 바꿨던것을 다싯 바꿈 
+        object, array 에 따옴표치면 JSON (JSON은 문자취급받음)
+        console.log(JSON.parse(e.data)) // 안녕하세요
+      */
+
+      // 메세지 html로 표시해주기
+      var data = JSON.parse(e.data);
+      data.forEach((element) => {
+        $('.chat-content').append('<li><span class="chat-box mine">' + element.content + '</span></li>')
+      })
+
+      /*
+        *** 크롬에서시크릿창 찾아서 상대방쪽도확인한번해보기
+        응용해볼것
+
+        1. 지금 /chat 페이지의 모든 메세지들은 회색으로 보입니다.
+        내가 보낸 메세지는 우측으로 옮기거나 색을 다르게 해주거나 그런건 어떻게 해야할까요?
+        아마 html css 잘하면 될듯요 
+
+        2. 지금 change stream 개발해놓은건 document 추가만 예상하고 짜놓은 코드입니다. 
+        document가 혹여나 수정되거나 삭제되는 경우는 어떻게 할까요? 
+        (실은 카톡같은거 생각해보면 수정, 삭제기능은 없어도 될듯 합니다)
+
+        3. 같은 상대와의 중복 채팅방 개설을 막으려면?
+      */
     })
   })
 </script>

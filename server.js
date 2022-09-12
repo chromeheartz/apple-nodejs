@@ -313,7 +313,19 @@ app.get('/message/:parentid', isLogined, (req, res) => {
     // 유저에게 데이터 전송. 어떤이름으로 데이터를 보낼것인지
     res.write('event: test\n'); // 보낼데이터이름 \n 엔터키와같다고생각.
     // 지금 누른 채팅방의 채팅메세지들
-    res.write(`data: ${JSON.stringify(결과)}\n\n`); // 보낼데이터
+    res.write(`data: ${JSON.stringify(result)}\n\n`); // 보낼데이터
+  })
+
+  // db가 업데이트되면 유저에게 쏴주는것 change stream
+  const pipeline = [
+    { $match: {} }
+  ];
+  const collection = database.collection('message');
+  const changeStream = collection.watch(pipeline);
+  changeStream.on('change', (result) => {
+    console.log(result.fullDocument)
+    res.write('event: test\n');
+    res.write(`data: ${JSON.stringify([result.fullDocument])}\n\n`); // 보낼데이터
   })
 
 });

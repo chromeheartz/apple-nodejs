@@ -565,6 +565,7 @@ app.post('/message', isLogined, (req, res) => {
   2. query string
   
 */
+
 app.get('/message/:parentid', isLogined, (req, res) => {
 
   res.writeHead(200, {
@@ -579,7 +580,27 @@ app.get('/message/:parentid', isLogined, (req, res) => {
     // 유저에게 데이터 전송. 어떤이름으로 데이터를 보낼것인지
     res.write('event: test\n'); // 보낼데이터이름 \n 엔터키와같다고생각.
     // 지금 누른 채팅방의 채팅메세지들
-    res.write(`data: ${JSON.stringify(결과)}\n\n`); // 보낼데이터
+    res.write(`data: ${JSON.stringify(result)}\n\n`); // 보낼데이터
+  })
+
+  // db가 업데이트되면 유저에게 쏴주는것 change stream
+  const pipeline = [
+    // 컬렉션안의 원하는 document만 감시하고싶으면. fullDocument 문자열로붙여줘야함
+    // { $match : { 'fullDocument.parent' : req.params.id } } //유저가 요청한 채팅방만 감시하고싶다면
+    { $match: {} }
+  ];
+  const collection = database.collection('message');
+  const changeStream = collection.watch(pipeline);
+  changeStream.on('change', (result) => {
+    /*
+      해당 컬렉션에 변동이 생기면 코드 실행. 파라미터를 만들어넣으면 변경된 결과들이나옴
+      fullDocument를 붙이는것은 result만 하면 너무많은 정보들이 나오는데 추가된 document만 알고싶어서 
+      축약해서 보여주게하는것. 
+    */
+    console.log(result.fullDocument)
+    // []로 감싸주는것은 서버에서 document찾을때 다 [{},{},{}...]이런 모양이여서 규격통일을위해
+    res.write('event: test\n');
+    res.write(`data: ${JSON.stringify([result.fullDocument])}\n\n`); // 보낼데이터
   })
 
 });
