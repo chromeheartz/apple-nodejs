@@ -1,6 +1,11 @@
 const express = require('express');
 const app = express();
 
+// socekt.io
+const http = require('http').createServer(app);
+const {Server} = require('socket.io');
+const io = new Server(http);
+
 // bodyparser 선언
 const bodyParser = require('body-parser');
 const { countReset } = require('console');
@@ -24,7 +29,7 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function (
 
   database = client.db('todoapp')
 
-  app.listen(process.env.PORT, function () {
+  http.listen(process.env.PORT, function () {
     console.log('listening on 7777')
   });
 })
@@ -329,3 +334,20 @@ app.get('/message/:parentid', isLogined, (req, res) => {
   })
 
 });
+
+
+// socket.io
+app.get('/socket', (req, res) => {
+  res.render('socket.ejs')
+})
+
+// 이벤트리스너의 일종. 누군가 웹소켓 접속하면 내부코드 실행하도록
+io.on('connection', (socket) => {
+  
+  // 서버에서 유저가 보낸 데이터 수신하기. parameter로 .on
+  socket.on('user-send', (data) => {
+    // 누가 'user-send'이름으로 메세지 보내면 내부코드 실행
+    console.log(data)
+  })
+
+})
