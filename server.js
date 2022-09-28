@@ -343,11 +343,27 @@ app.get('/socket', (req, res) => {
 
 // 이벤트리스너의 일종. 누군가 웹소켓 접속하면 내부코드 실행하도록
 io.on('connection', (socket) => {
-  
+  // console.log(socket.id)
+
+  // 채팅방생성, 입장시키기
+  socket.on('room1-send', (data) => {
+    // to에 room1이라고 쓰면 room1 들어간 유저에게 전송됨
+    io.to('room1').emit('broadcast', data)
+  })
+
+  // 채팅방생성, 입장시키기
+  socket.on('joinroom', (data) => {
+    socket.join('room1');
+  })
+
   // 서버에서 유저가 보낸 데이터 수신하기. parameter로 .on
   socket.on('user-send', (data) => {
     // 누가 'user-send'이름으로 메세지 보내면 내부코드 실행
     console.log(data)
+
+    // 서버 -> 유저 메세지 전송
+    io.emit('broadcast', data)
+
   })
 
 })

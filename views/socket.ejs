@@ -16,7 +16,15 @@
 <body>
 
   <div>채팅방</div>
+  <input id="input1" />
   <button id="send">서버에 메세지 보내기</button>
+
+  <button id="room1">채팅방1 입장</button>
+  <button id="room1-send">채팅방1에서 메세지보내기 입장</button>
+
+  <div id="content">
+
+  </div>
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <!-- socket.io cdn npm version과 같은 version-->
@@ -26,10 +34,26 @@
     // 유저가 웹소켓 접속하도록
     var socket = io();
 
+    $('#room1-send').click(function(){
+      // socket으로 GET/POST 요청 대체가능
+      socket.emit('room1-send', '반가워 채팅방1사람들')
+    })
+
+    $('#room1').click(function(){
+      // socket으로 GET/POST 요청 대체가능
+      socket.emit('joinroom', '채팅방입장시켜줘')
+    })
+
     $('#send').click(function(){
       // 서버에게 웹소켓으로 실시간 메세지보내기
       // socket.emit(작명, 메세지)
-      socket.emit('user-send','안녕하세요')
+      socket.emit('user-send',$('#input1').val())
+    })
+
+    // 메세지 수신은 언제나 socekt.on()
+    socket.on('broadcast', (data) => {
+      // 서버가 broadcast이름을 보내면 실행할 코드
+      $('#content').append('<div>' + data + '</div>')
     })
   </script>
 

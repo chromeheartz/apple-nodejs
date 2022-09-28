@@ -618,12 +618,48 @@ app.get('/socket', (req, res) => {
 })
 
 // 이벤트리스너의 일종. 누군가 웹소켓 접속하면 내부코드 실행하도록
+/*
+  소켓 정리
+  서버 -> 유저메세지 전송은 io.emit()
+  * io.emit() 소켓에 참여하고있는 모든 유저에게 메세지보냄
+  메세지 수신은 언제나 socket.on()
+*/
 io.on('connection', (socket) => {
+
+  // 채팅방생성, 입장시키기
+  socket.on('room1-send', (data) => {
+    // to에 room1이라고 쓰면 room1 들어간 유저에게 전송됨
+    io.to('room1').emit('broadcast', data)
+  })
+
+  // 채팅방생성, 입장시키기
+  socket.on('joinroom', (data) => {
+    socket.join('room1');
+  })
+  
   
   // 서버에서 유저가 보낸 데이터 수신하기. parameter로 .on
   socket.on('user-send', (data) => {
     // 누가 'user-send'이름으로 메세지 보내면 내부코드 실행
     console.log(data)
+
+
+    // 서버 -> 유저 메세지 전송
+    io.emit('broadcast', data)
+    // io.to(socket.id).emit('broadcast', data)
+
+    /*
+      io.to(socekt.id).emit('broadcast', data)
+      to 라는 함수를 써주면 전체가 아니라 서버 - 유저1명간 단독소통하게
+      지정해줄수있다.
+      socket.id를 가진 사람한테만 메세지를 emit(전송)해줄 수 있다.
+
+      * socket.id는 socket에 접속을 하면 
+      io.on에 매개변수 socket에 접속유저정보들이 들어가있다.
+      어떤브라우저를 쓰는지, 헤더정보, 쿠키 등등이 들어있는데
+      socket.id를 찾아보면 접속한유저의 유니크한 id가 들어가있다.
+    */
+
   })
 
 })
